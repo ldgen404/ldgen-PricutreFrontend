@@ -29,6 +29,12 @@
               </ASpace>
               <template #overlay>
                 <a-menu>
+                  <a-menu-item>
+                    <router-link to="/my_space">
+                      <UserOutlined />
+                      我的空间
+                    </router-link>
+                  </a-menu-item>
                   <a-menu-item @click="doLogOut">
                     <LogoutOutlined />
                     退出登录
@@ -49,7 +55,7 @@
 
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue'
-import { HomeOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, UserOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
@@ -69,10 +75,22 @@ const originItems = [
     label: '主页',
     title: '主页',
   },
+
   {
     key: '/admin/userManage',
     label: '用户管理',
     title: '用户管理',
+  },
+  {
+    key: '/admin/pictureManage',
+    label: '图片管理',
+    title: '图片管理',
+  },
+
+  {
+    key: '/admin/spaceManage',
+    label: '空间管理',
+    title: '空间管理',
   },
   {
     key: '/add_picture',
@@ -80,14 +98,16 @@ const originItems = [
     title: '创建图片',
   },
   {
-    key: '/admin/pictureManage',
-    label: '图片管理',
-    title: '图片管理',
-  },
-  {
     key: 'others',
-    label: h('a', { href: 'https://www.codefather.cn', target: '_blank' }, '编程导航'),
-    title: '编程导航',
+    label: h(
+      'a',
+      {
+        href: 'https://github.com/L-studentBigData',
+        target: '_blank',
+      },
+      '菜菜，大佬求带',
+    ),
+    title: '菜菜，大佬求带',
   },
 ]
 

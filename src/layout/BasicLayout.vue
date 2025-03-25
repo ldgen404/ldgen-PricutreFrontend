@@ -4,9 +4,13 @@
       <a-layout-header class="header">
         <GlobaHeader />
       </a-layout-header>
-      <a-layout-content class="content">
-        <router-view />
-      </a-layout-content>
+      <!--内容区域同级-->
+      <a-layout>
+        <GlobalSider class="sider" />
+        <a-layout-content class="content">
+          <router-view />
+        </a-layout-content>
+      </a-layout>
       <a-layout-footer class="footer">
         <a href="https://github.com/L-studentBigData" target="_blank">
           程序员李大帅 by github地址
@@ -18,14 +22,25 @@
 
 <script setup lang="ts">
 import GlobaHeader from '@/components/GlobalHeader.vue'
+import GlobalSider from '@/components/GlobalSider.vue'
 </script>
 
 <style scoped>
 #basicLayout .header {
   padding-inline: 20px;
-  margin-bottom: 16px;
   color: unset;
   background: white;
+  margin-bottom: 1px;
+}
+
+#basicLayout .sider {
+  background: #fff;
+  border-right: 0.5px solid #eee;
+}
+
+#basicLayout :deep(.ant-menu-root) {
+  border-bottom: none !important;
+  border-inline-end: none !important;
 }
 
 #basicLayout .content {
