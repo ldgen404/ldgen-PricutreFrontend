@@ -4,6 +4,7 @@
       <a-layout-header class="header">
         <GlobaHeader />
       </a-layout-header>
+
       <!--内容区域同级-->
       <a-layout>
         <GlobalSider class="sider" />
@@ -11,6 +12,7 @@
           <router-view />
         </a-layout-content>
       </a-layout>
+
       <a-layout-footer class="footer">
         <a href="https://github.com/L-studentBigData" target="_blank">
           程序员李大帅 by github地址
@@ -35,6 +37,7 @@ import GlobalSider from '@/components/GlobalSider.vue'
 
 #basicLayout .sider {
   background: #fff;
+  padding-top: 20px;
   border-right: 0.5px solid #eee;
 }
 
@@ -46,7 +49,7 @@ import GlobalSider from '@/components/GlobalSider.vue'
 #basicLayout .content {
   background: linear-gradient(to right, #fefefe, #fff);
   margin-bottom: 28px;
-  padding: 20px;
+  padding: 28px;
 }
 
 #basicLayout .footer {

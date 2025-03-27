@@ -1,26 +1,28 @@
 <template>
   <div id="globalSider">
-    <a-layout-sider
-      v-if="loginUserStore.loginUser.id"
-      width="200"
-      breakpoint="lg"
-      collapsed-width="0"
-    >
-      <a-menu v-model:selectKeys="current" mode="inline" :items="menuItems" @click="doMenuClick" />
+    <a-layout-sider v-if="loginUserStore.loginUser.id" class="sider" width="200" breakpoint="lg">
+      <a-menu
+        mode="inline"
+        v-model:selectedKeys="current"
+        :items="menuItems"
+        @click="doMenuClick"
+      />
     </a-layout-sider>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, h, ref } from 'vue'
+import { h, ref, watch } from 'vue'
 import { PictureOutlined, UserOutlined } from '@ant-design/icons-vue'
-import { type MenuProps } from 'ant-design-vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-// 路由跳转事件
+
+// 获取路由实例
 const router = useRouter()
+const route = useRoute()
 const loginUserStore = useLoginUserStore()
 
+// 菜单列表
 const menuItems = [
   {
     key: '/',
@@ -34,32 +36,21 @@ const menuItems = [
   },
 ]
 
-// 当前选中菜单
-const current = ref<string[]>([])
-// 监听路由变化，更新当前选中菜单
-router.afterEach((to, from, failure) => {
-  current.value = [to.path]
-})
+// 当前选中的菜单项
+const current = ref<string[]>([route.path])
 
-// 路由跳转事件
+// 监听路由变化，确保菜单高亮
+watch(
+  () => route.path,
+  (newPath) => {
+    current.value = [newPath]
+  },
+  { immediate: true },
+)
+
+// 菜单点击事件，进行路由跳转
 const doMenuClick = ({ key }: { key: string }) => {
-  router.push({
-    path: key,
-  })
-}
-
-// 过滤菜单项
-const filterMenus = (menus = [] as MenuProps['items']) => {
-  return menus?.filter((menu) => {
-    // 管理员才能查看admin开头的菜单
-    if (menu?.key?.startsWith('/admin')) {
-      const loginUser = loginUserStore.loginUser
-      if (!loginUser || loginUser.userRole !== 'admin') {
-        return false
-      }
-    }
-    return true
-  })
+  router.push(key)
 }
 </script>
 

@@ -4,7 +4,6 @@
       <h2>空间管理</h2>
       <a-button type="primary" href="/add_space" target="_blank">+ 创建空间</a-button>
     </a-flex>
-
     <div style="margin-bottom: 16px" />
     <!-- 搜索表单 -->
     <a-form layout="inline" :model="searchParams" @finish="doSearch">
@@ -68,12 +67,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
-import {
-  SPACE_LEVEL_MAP,
-  SPACE_LEVEL_OPTIONS,
-  SPACE_TYPE_MAP,
-  SPACE_TYPE_OPTIONS,
-} from '@/constants/space.ts'
+import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS } from '@/constants/space.ts'
 import { formatSize } from '@/utils'
 
 const columns = [

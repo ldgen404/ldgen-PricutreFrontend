@@ -157,7 +157,10 @@ const pagination = computed(() => ({
 }))
 
 const fetchData = async () => {
-  const res = await listPictureByPageUsingPost(searchParams)
+  const res = await listPictureByPageUsingPost({
+    ...searchParams,
+    nullSpaceId: true,
+  })
   dataList.value = res.data.data?.records || []
   total.value = Number(res.data.data?.total || 0)
 }

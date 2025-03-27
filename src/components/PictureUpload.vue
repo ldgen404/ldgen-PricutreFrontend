@@ -29,33 +29,6 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
-/**
- * 上传图片
- * @param file
- */
-const handleUpload = async ({ file }: any) => {
-  loading.value = true
-  try {
-    const params: API.uploadPictureUsingPOSTParams = props.picture ? { id: props.picture.id } : {}
-    params.spaceId = props.spaceId
-    const res = await uploadPictureUsingPost(params, {}, file)
-    if (res.data.code === 0 && res.data.data) {
-      message.success('图片上传成功')
-      // 将上传成功的图片信息传递给父组件
-      props.onSuccess?.(res.data.data)
-    } else {
-      message.error('图片上传失败，' + res.data.message)
-    }
-  } catch (error) {
-    console.error('图片上传失败', error)
-    message.error('图片上传失败，' + error.message)
-  }
-  loading.value = false
-}
-
-const loading = ref<boolean>(false)
-
 /**
  * 上传前的校验
  * @param file
@@ -73,6 +46,32 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   }
   return isJpgOrPng && isLt2M
 }
+/**
+ * 上传图片
+ * @param file
+ */
+const handleUpload = async ({ file }: any) => {
+  loading.value = true
+  try {
+    // 上传时传递 spaceId
+    const params: API.PictureUploadRequest = props.picture ? { id: props.picture.id } : {}
+    params.spaceId = props.spaceId
+    const res = await uploadPictureUsingPost(params, {}, file)
+    if (res.data.code === 0 && res.data.data) {
+      message.success('图片上传成功')
+      // 将上传成功的图片信息传递给父组件
+      props.onSuccess?.(res.data.data)
+    } else {
+      message.error('图片上传失败，' + res.data.message)
+    }
+  } catch (error) {
+    console.error('图片上传失败', error)
+    message.error('图片上传失败，' + error.message)
+  }
+  loading.value = false
+}
+
+const loading = ref<boolean>(false)
 </script>
 <style scoped>
 .picture-upload :deep(.ant-upload) {

@@ -3,14 +3,17 @@
     <h2 style="margin-bottom: 16px">
       {{ route.query?.id ? '修改图片' : '创建图片' }}
     </h2>
-
+    <a-typography-paragraph v-if="spaceId" type="secondary">
+      保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
+    </a-typography-paragraph>
     <!-- 选择上传方式 -->
     <a-tabs v-model:activeKey="uploadType">
       <a-tab-pane key="file" tab="文件上传">
-        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+        <!--spaceID上传到后端-->
+        <PictureUpload :picture="picture" :onSuccess="onSuccess" :spaceId="spaceId" />
       </a-tab-pane>
       <a-tab-pane key="url" tab="URL 上传" force-render>
-        <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
+        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
     </a-tabs>
 
@@ -53,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import PictureUpload from '@/components/PictureUpload.vue'
@@ -61,17 +64,20 @@ import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 import {
   editPictureUsingPost,
   getPictureVoByIdUsingGet,
-  listPictureTagCategoryUsingGet,
+  listPictureTagCategoryUsingGet
 } from '@/api/pictureController.ts'
-
+// 空间 id
+const router = useRouter()
+const route = useRoute()
+const spaceId = computed(() => {
+  return route.query?.spaceId
+})
 // 选中的上传方式
 const uploadType = ref<'file' | 'url'>('file')
 
 // 图片数据
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
-const router = useRouter()
-const route = useRoute()
 
 // 监听上传方式的切换，切换时清空图片数据
 watch(uploadType, () => {
@@ -95,6 +101,7 @@ const handleSubmit = async (values: any) => {
 
   const res = await editPictureUsingPost({
     id: pictureId,
+    spaceId: spaceId.value,
     ...values,
   })
 

@@ -1,5 +1,7 @@
 <template>
-  <div id="mySpace"></div>
+  <div id="mySpace">
+    <p>正在跳转，请稍候...</p>
+  </div>
 </template>
 
 <script setup lang="ts">

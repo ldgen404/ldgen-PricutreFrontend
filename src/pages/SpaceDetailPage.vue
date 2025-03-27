@@ -1,13 +1,13 @@
 <template>
-  <div id="pictureDetailPage">
-    <!--展示空间基本信息-->
+  <div id="SpaceDetailPage">
     <!-- 空间信息 -->
     <a-flex justify="space-between">
-      <h2>{{ space.spaceName }}（私有空间）</h2>
+      <h2>{{ space.spaceName }}（个人空间）</h2>
       <a-space size="middle">
         <a-button type="primary" :href="`/add_picture?spaceId=${id}`" target="_blank">
           + 创建图片
         </a-button>
+        <!--进度条-->
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
         >
@@ -19,32 +19,35 @@
         </a-tooltip>
       </a-space>
     </a-flex>
+    <!-- 图片列表 -->
+    <PictureList :dataList="dataList" :loading="loading" :showOp="true" :onReload="fetchData" />
+    <a-pagination
+      style="text-align: right"
+      v-model:current="searchParams.current"
+      v-model:pageSize="searchParams.pageSize"
+      :total="total"
+      :show-total="() => `图片总数 ${total} / ${space.maxCount}`"
+      @change="onPageChange"
+    />
   </div>
-  <!-- 图片列表 -->
-  <PictureList :dataList="dataList" :loading="loading" />
-  <a-pagination
-    style="text-align: right"
-    v-model:current="searchParams.current"
-    v-model:pageSize="searchParams.pageSize"
-    :total="total"
-    :show-total="() => `图片总数 ${total} / ${space.maxCount}`"
-    @change="onPageChange"
-  />
 </template>
-<script setup lang="ts">
+
+<script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
+import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
 import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
-import PictureList from '@/components/PictureList.vue'
 import { formatSize } from '@/utils'
+import PictureList from '@/components/PictureList.vue'
 
-const props = defineProps<{
+interface Props {
   id: string | number
-}>()
+}
+
+const props = defineProps<Props>()
 const space = ref<API.SpaceVO>({})
 
-// 获取空间详情
+// -------------------获取空间详情-------------------
 const fetchSpaceDetail = async () => {
   try {
     const res = await getSpaceVoByIdUsingGet({
@@ -59,13 +62,9 @@ const fetchSpaceDetail = async () => {
     message.error('获取空间详情失败：' + e.message)
   }
 }
-
-onMounted(() => {
-  fetchSpaceDetail()
-})
-
+// -------------------获取图片信息-------------------
 // 数据
-const dataList = ref([])
+const dataList = ref<API.PictureVO[]>([])
 const total = ref(0)
 const loading = ref(true)
 
@@ -106,6 +105,7 @@ const fetchData = async () => {
 onMounted(() => {
   fetchData()
 })
+onMounted(() => {
+  fetchSpaceDetail()
+})
 </script>
-
-<style scoped></style>
