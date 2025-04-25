@@ -47,9 +47,24 @@
               {{ formatSize(picture.picSize) }}
             </a-descriptions-item>
           </a-descriptions>
+
+          <a-descriptions-item label="主色调">
+            <a-space>
+              {{ picture.picColor ?? '-' }}
+              <div
+                v-if="picture.picColor"
+                :style="{
+                  backgroundColor: toHexColor(picture.picColor),
+                  width: '16px',
+                  height: '16px',
+                }"
+              />
+            </a-space>
+          </a-descriptions-item>
         </a-card>
       </a-col>
     </a-row>
+
     <a-space wrap>
       <a-button v-if="canEdit" type="default" @click="doEdit">
         编辑
@@ -79,7 +94,7 @@
 import { message } from 'ant-design-vue'
 import { computed, onMounted, ref } from 'vue'
 import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
-import { downloadImage, formatSize } from '@/utils'
+import { downloadImage, formatSize, toHexColor } from '@/utils'
 import router from '@/router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 

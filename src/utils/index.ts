@@ -37,4 +37,3 @@ export function toHexColor(input: string) {
   // 返回标准 #RRGGBB 格式
   return `#${hexColor}`
 }
-

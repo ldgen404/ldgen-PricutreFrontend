@@ -1,5 +1,8 @@
 <template>
   <div class="picture-list">
+    <!-- 分享弹窗组件 -->
+    <ShareModal ref="shareModalRef" :link="shareLink" />
+
     <!-- 图片列表 -->
     <a-list
       :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 5, xxl: 6 }"
@@ -8,8 +11,21 @@
     >
       <template #renderItem="{ item: picture }">
         <a-list-item style="padding: 0">
-          <!-- 单张图片 -->
-          <a-card hoverable @click="doClickPicture(picture)">
+          <!-- 单张图片卡片 -->
+          <a-card
+            hoverable
+            @click="doClickPicture(picture)"
+            :actions="
+              showOp
+                ? [
+                    h(SearchOutlined, { onClick: (e) => doSearch(picture, e) }),
+                    h(ShareAltOutlined, { onClick: (e) => doShare(picture, e) }),
+                    h(EditOutlined, { onClick: (e) => doEdit(picture, e) }),
+                    h(DeleteOutlined, { onClick: (e) => doDelete(picture, e) }),
+                  ]
+                : []
+            "
+          >
             <template #cover>
               <img
                 style="height: 180px; object-fit: cover"
@@ -18,6 +34,7 @@
                 loading="lazy"
               />
             </template>
+
             <a-card-meta :title="picture.name">
               <template #description>
                 <a-flex>
@@ -30,16 +47,6 @@
                 </a-flex>
               </template>
             </a-card-meta>
-            <template v-if="showOp" #actions>
-              <a-space @click="(e) => doEdit(picture, e)">
-                <EditOutlined />
-                编辑
-              </a-space>
-              <a-space @click="(e) => doDelete(picture, e)">
-                <DeleteOutlined />
-                删除
-              </a-space>
-            </template>
           </a-card>
         </a-list-item>
       </template>
@@ -49,9 +56,16 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { deletePictureUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
+import { h, ref } from 'vue'
+import {
+  SearchOutlined,
+  ShareAltOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons-vue'
+import ShareModal from '@/components/ShareModal.vue'
 
 interface Props {
   dataList?: API.PictureVO[]
@@ -63,6 +77,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   dataList: () => [],
   loading: false,
+  showOp: false,
 })
 
 // 跳转至图片详情
@@ -99,6 +114,25 @@ const doDelete = async (picture, e) => {
     props?.onReload()
   } else {
     message.error('删除失败')
+  }
+}
+// 搜索
+const doSearch = (picture, e) => {
+  e.stopPropagation()
+  window.open(`/search_picture?pictureId=${picture.id}`)
+}
+
+// 分享弹窗引用
+const shareModalRef = ref()
+// 分享链接
+const shareLink = ref<string>()
+
+// 分享
+const doShare = (picture: API.PictureVO, e: Event) => {
+  e.stopPropagation()
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.openModal()
   }
 }
 </script>

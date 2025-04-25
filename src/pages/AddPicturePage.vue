@@ -16,6 +16,28 @@
         <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
     </a-tabs>
+    <!--图片编辑-->
+    <div v-if="picture" class="edit-bar">
+      <a-space size="middle">
+        <a-button :icon="h(EditOutlined)" @click="doEditPicture">编辑图片</a-button>
+        <a-button type="primary" ghost :icon="h(FullscreenOutlined)" @click="doImagePainting"
+          >AI图片
+        </a-button>
+      </a-space>
+      <ImageCropper
+        ref="imageCropperRef"
+        :imageUrl="picture?.url"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onImageOutPaintingSuccess"
+      />
+      <ImageOutPainting
+        ref="imageOutPaintingRef"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onImageOutPaintingSuccess"
+      />
+    </div>
 
     <!-- 图片信息表单 -->
     <a-form v-if="picture" layout="vertical" :model="pictureForm" @finish="handleSubmit">
@@ -47,7 +69,6 @@
           allowClear
         />
       </a-form-item>
-
       <a-form-item>
         <a-button type="primary" html-type="submit" style="width: 100%">创建</a-button>
       </a-form-item>
@@ -56,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { h, computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import PictureUpload from '@/components/PictureUpload.vue'
@@ -66,6 +87,10 @@ import {
   getPictureVoByIdUsingGet,
   listPictureTagCategoryUsingGet
 } from '@/api/pictureController.ts'
+
+import ImageCropper from '@/components/ImageCropper.vue'
+import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
+import ImageOutPainting from '@/pages/ImageOutPainting.vue'
 // 空间 id
 const router = useRouter()
 const route = useRoute()
@@ -102,7 +127,7 @@ const handleSubmit = async (values: any) => {
   const res = await editPictureUsingPost({
     id: pictureId,
     spaceId: spaceId.value,
-    ...values,
+    ...values
   })
 
   if (res.data.code === 0 && res.data.data) {
@@ -123,11 +148,11 @@ const getTagCategoryOptions = async () => {
   if (res.data.code === 0 && res.data.data) {
     tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => ({
       value: data,
-      label: data,
+      label: data
     }))
     categoryOptions.value = (res.data.data.categoryList ?? []).map((data: string) => ({
       value: data,
-      label: data,
+      label: data
     }))
   } else {
     message.error('加载选项失败：' + res.data.message)
@@ -149,7 +174,35 @@ const getOldPicture = async () => {
     }
   }
 }
+// 图片编辑弹窗引用
+const imageCropperRef = ref()
 
+// 编辑图片
+const doEditPicture = () => {
+  if (imageCropperRef.value && picture.value?.url) {
+    console.log('准备打开图片编辑器，图片URL:', picture.value.url)
+    imageCropperRef.value.openModal()
+  } else {
+    message.warning('无法编辑图片，请确保图片已上传')
+    console.warn('无法编辑图片', {
+      imageCropper: !!imageCropperRef.value,
+      pictureUrl: picture.value?.url
+    })
+  }
+}
+
+// AI 扩图弹窗引用
+const imageOutPaintingRef = ref()
+
+// AI 扩图弹窗打开
+const doImagePainting = () => {
+  imageOutPaintingRef.value?.openModal()
+}
+
+// 编辑成功事件
+const onImageOutPaintingSuccess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+}
 // 组件挂载时加载数据
 onMounted(() => {
   getOldPicture()
@@ -161,5 +214,10 @@ onMounted(() => {
 #addPicturePage {
   max-width: 720px;
   margin: 0 auto;
+}
+
+#addPicturePage .edit-bar {
+  text-align: center;
+  margin: 16px 0;
 }
 </style>
